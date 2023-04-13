@@ -1,7 +1,6 @@
 function Pinboard({showBoard, content, boardIndex, handleDragStart, handleDragEnd, boardContents, setBoardContents}) {
     const handleBoardDragEnd = (e) => {
         handleDragEnd(e);
-        console.log(e);
         const newBoardContents = boardContents;
         const updatedBoard = boardContents[boardIndex];
         const deletedIndex = updatedBoard.indexOf(e.target.src);

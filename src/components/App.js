@@ -9,7 +9,7 @@ function App() {
   const [dragOverTimer, setDragOverTimer] = useState(0);
   const [dragTarget, setDragTarget] = useState(null);
 
-  const DRAGOVER_TIMER = 35;
+  const DRAGOVER_SWITCH_DELAY = 1000;
 
   function openBoard(index) {
     const newBoardsDisplayed = new Array(boardsDisplayed.length).fill(false);
@@ -34,12 +34,12 @@ function App() {
   }
 
   const handleLeftDragOver = () => {
-    if (dragOverTimer === DRAGOVER_TIMER) {
-      setDragOverTimer(5);
+    if (dragOverTimer === 0) {
+      setDragOverTimer(Date.now());
+    } else if (Date.now() - dragOverTimer > DRAGOVER_SWITCH_DELAY) {
+      setDragOverTimer(Date.now() - 100);
       const prevBoardIndex = Math.max(0, currentBoard - 1);
       openBoard(prevBoardIndex);
-    } else {
-      setDragOverTimer(dragOverTimer + 1);
     }
   }
 
@@ -49,12 +49,12 @@ function App() {
   }
 
   const handleRightDragOver = () => {
-    if (dragOverTimer === DRAGOVER_TIMER) {
-      setDragOverTimer(5);
+    if (dragOverTimer === 0) {
+      setDragOverTimer(Date.now());
+    } else if (Date.now() - dragOverTimer > DRAGOVER_SWITCH_DELAY) {
+      setDragOverTimer(Date.now() -  100);
       const nextBoardIndex = Math.min(boardsDisplayed.length - 1, currentBoard + 1);
       openBoard(nextBoardIndex);
-    } else {
-      setDragOverTimer(dragOverTimer + 1);
     }
   }
 
