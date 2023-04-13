@@ -1,1 +1,2 @@
-# react-test
+npm start
+npm test
