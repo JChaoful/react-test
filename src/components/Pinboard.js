@@ -1,18 +1,17 @@
-function Pinboard({showBoard, content, index, handleDragStart, handleDragEnd, boardContents, setBoardContents}) {
+function Pinboard({showBoard, content, boardIndex, handleDragStart, handleDragEnd, boardContents, setBoardContents}) {
     const handleBoardDragEnd = (e) => {
         handleDragEnd(e);
-        if (e.dataTransfer.dropEffect === 'none') {
-            const newBoardContents = boardContents;
-            const updatedBoard = boardContents[index];
-            const deletedIndex = updatedBoard.indexOf(e.target.src);
-            updatedBoard.splice(deletedIndex, 1);
-            newBoardContents[index] = updatedBoard;
-            setBoardContents(newBoardContents);
-        }
+        console.log(e);
+        const newBoardContents = boardContents;
+        const updatedBoard = boardContents[boardIndex];
+        const deletedIndex = updatedBoard.indexOf(e.target.src);
+        updatedBoard.splice(deletedIndex, 1);
+        newBoardContents[boardIndex] = updatedBoard;
+        setBoardContents(newBoardContents);
     }
     
     const images = content.map((src, index) => 
-        <img src={src} key={index} className="pinboard-image" alt="pinboard-originated" draggable onDragStart={handleDragStart} onDragEnd={handleBoardDragEnd}/>
+        <img src={src} key={index} origin={boardIndex} className="pinboard-image" alt="pinboard-originated" draggable onDragStart={handleDragStart} onDragEnd={handleBoardDragEnd}/>
     );
 
     const handleBoardDragOver = (e) => {
@@ -20,9 +19,9 @@ function Pinboard({showBoard, content, index, handleDragStart, handleDragEnd, bo
     }
 
     return (
-        <div className="board-container">
+        <div className="board-container" boardindex={boardIndex}>
             <div style={{display: showBoard ? "flex" : "none"}} className="board" onDragOver={handleBoardDragOver}>
-            <p className="label">Current Pinboard: {index}</p>
+            <p className="label">Current Pinboard: {boardIndex}</p>
             <div className="images">
                 {images}
             </div>
