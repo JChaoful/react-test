@@ -7,10 +7,9 @@ function App() {
   const [boardsDisplayed, setBoardsDisplayed] = useState([true, false, false]);
   const [boardContents, setBoardContents] = useState([["/pinboard-0-initial-image.jpg"],["/pinboard-1-initial-image.jpg"],["/pinboard-2-initial-image.jpg"]]);
   const [dragOverTimer, setDragOverTimer] = useState(0);
-
   const [dragTarget, setDragTarget] = useState(null);
 
-  const DRAGOVER_TIMER = 30;
+  const DRAGOVER_TIMER = 35;
 
   function openBoard(index) {
     const newBoardsDisplayed = new Array(boardsDisplayed.length).fill(false);
@@ -35,7 +34,7 @@ function App() {
   }
 
   const handleLeftDragOver = () => {
-    if (dragOverTimer > DRAGOVER_TIMER) {
+    if (dragOverTimer === DRAGOVER_TIMER) {
       setDragOverTimer(5);
       const prevBoardIndex = Math.max(0, currentBoard - 1);
       openBoard(prevBoardIndex);
@@ -50,7 +49,7 @@ function App() {
   }
 
   const handleRightDragOver = () => {
-    if (dragOverTimer > DRAGOVER_TIMER) {
+    if (dragOverTimer === DRAGOVER_TIMER) {
       setDragOverTimer(5);
       const nextBoardIndex = Math.min(boardsDisplayed.length - 1, currentBoard + 1);
       openBoard(nextBoardIndex);
