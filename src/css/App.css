@@ -64,12 +64,18 @@ h1 {
 }
 
 .chevron {
-  font-size: 16vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: calc(min(10vw,16vh));
+  height: 85%;
   background-color: #ff8ba7;
   padding: 7px;
   border: 4px solid rgba(0, 0, 0, 0.15);
   border-radius: 10px;
 }
+
 
 .fa-chevron-left {
   margin-right: 5px;
@@ -84,13 +90,13 @@ h1 {
 }
 .pinboard-carousel .board {
   width: 50vw;
-  height: calc(100% - 10px);
+  height: calc(100% - 30px);
   display: flex;
   flex-direction: column;
   align-items: stretch;
   background-color: #ffc6c7;
   border: 4px solid rgba(0, 0, 0, 0.15);
-  margin: 5px 0;
+  margin: 15px 0;
 }
 
 .board > .label {
@@ -105,6 +111,7 @@ h1 {
 .pinboard-image {
   margin: 5px;
   width: 25%;
+  min-width: 80px;
 }
 
 footer {
@@ -113,7 +120,6 @@ footer {
 
 footer > p {
   color: #594a4e;
-  padding: 5px;
   border-radius: 8px;
 }
 /* .App-header {
