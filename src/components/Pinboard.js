@@ -11,7 +11,7 @@ function Pinboard({showBoard, content, boardIndex, handleDragStart, handleDragEn
     }
     
     const images = content.map((src, index) => 
-        <img src={src} key={index} origin={boardIndex} className="pinboard-image" alt="pinboard-originated" draggable onDragStart={handleDragStart} onDragEnd={handleBoardDragEnd}/>
+        <img src={src} key={index} className="pinboard-image" alt="pinboard-originated" draggable onDragStart={handleDragStart} onDragEnd={handleBoardDragEnd}/>
     );
 
     const handleBoardDragOver = (e) => {
@@ -19,7 +19,7 @@ function Pinboard({showBoard, content, boardIndex, handleDragStart, handleDragEn
     }
 
     return (
-        <div className="board-container" boardindex={boardIndex}>
+        <div className="board-container">
             <div style={{display: showBoard ? "flex" : "none"}} className="board" onDragOver={handleBoardDragOver}>
             <p className="label">Current Pinboard: {boardIndex}</p>
             <div className="images">

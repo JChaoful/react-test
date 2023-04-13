@@ -78,7 +78,7 @@ function App() {
       <h1>Pinboard App</h1>
       <div className="searched-images">
         <p className="label">Searched Images: </p>
-        <img src="/sample-image.jpg" className="sample-image" alt="cat from search result" origin={-1} draggable onDragStart={handleDragStart} onDragEnd={handleDragEnd}/>
+        <img src="/sample-image.jpg" className="sample-image" alt="cat from search result" draggable onDragStart={handleDragStart} onDragEnd={handleDragEnd}/>
       </div>
       <div className="pinboard-carousel" onDrop={handleBoardDrop}>
         <i className="fa-solid fa-chevron-left chevron" onClick={handleLeftClick} onDragOver={handleLeftDragOver} onDragLeave={handleArrowDragleave}/>
