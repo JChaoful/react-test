@@ -19,7 +19,7 @@ function Pinboard({showBoard, content, boardIndex, handleDragStart, handleDragEn
 
     return (
         <div className="board-container">
-            <div style={{display: showBoard ? "flex" : "none"}} className="board" onDragOver={handleBoardDragOver}>
+            <div style={{display: showBoard ? "flex" : "none"}} className={`board board-index-${boardIndex}`} onDragOver={handleBoardDragOver}>
             <p className="label">Current Pinboard: {boardIndex}</p>
             <div className="images">
                 {images}
