@@ -13,10 +13,12 @@ describe("basic functionality", () => {
   })
 
   it("can store MULTIPLE searched sample images with drag and drop", () => {
-    cy.dragAndDrop(".sample-image",".board.board-index-0");
-    cy.dragAndDrop(".sample-image",".board.board-index-0");
-    cy.dragAndDrop(".sample-image",".board.board-index-0");
-    cy.get(".board.board-index-0 > .images")
+    const sampleImage = ".sample-image";
+    const board = ".board.board-index-0";
+    cy.dragAndDrop(sampleImage, board);
+    cy.dragAndDrop(sampleImage, board);
+    cy.dragAndDrop(sampleImage, board);
+    cy.get(`${board} > .images`)
       .children('img[src$="/sample-image.jpg"]', {timeout: 300})
       .should("have.length", 3);
   })  
@@ -106,11 +108,306 @@ describe("basic functionality", () => {
 
 // Pinboard data storage tests/arrow functionality
 // check arrow changes on dragover
-// check whether boards save moved content 
+// check whether boards save moved content
 // check ability to drag sample image to different boards 
 // check ability to remove image from different boards
 // test transfer of image from one pinboard to another (middle one)  (removes image from original, stores in other pinboard)
+
 // test transfer of image from one pinboard to another while moving out of the board boundary
+
+describe ("Data storage integrity tests", () => {
+  beforeEach(() => {
+    cy.visit("/");
+  })
+
+  it("check pinboard change after dragging over arrow", () => {
+    const sampleImage = ".sample-image";
+    const leftChevron = ".fa-chevron-left";
+    const rightChevron = ".fa-chevron-right";
+    const board0 = ".board.board-index-0";
+    const board1 = ".board.board-index-1";
+    const board2 = ".board.board-index-2";
+    const sampleImagedataTransfer = new DataTransfer()
+    cy.get(board0).should('be.visible');
+    cy.get(board1).should('be.not.visible');
+    cy.get(board2).should('be.not.visible');
+    cy.get(sampleImage).trigger("dragstart", {
+      sampleImagedataTransfer
+    });
+
+    for (var i = 0; i < 10; i++) {
+      cy.get(rightChevron).trigger("dragover", {
+        sampleImagedataTransfer
+      });
+      cy.wait(100);
+    }
+    
+    cy.get(board0).should('be.not.visible');
+    cy.get(board1).should('be.visible');
+    cy.get(board2).should('be.not.visible');
+
+    for (var i = 0; i < 10; i++) {
+      cy.get(leftChevron).trigger("dragover", {
+        sampleImagedataTransfer
+      });
+      cy.wait(100);
+    }
+
+    cy.get(board0).should('be.visible');
+    cy.get(board1).should('be.not.visible');
+    cy.get(board2).should('be.not.visible');
+  })
+
+  it("check whether images are saved moving between pinboards", () => {
+    const sampleImage = ".sample-image";
+    const leftChevron = ".fa-chevron-left";
+    const rightChevron = ".fa-chevron-right";
+    const board0 = ".board.board-index-0";
+    const board1 = ".board.board-index-1";
+
+    cy.get(board0).should('be.visible');
+    cy.get(board1).should('be.not.visible');
+    cy.dragAndDrop(sampleImage,board0);
+    cy.get(`${board0} > .images`)
+      .children({timeout: 300})
+      .should("have.length", 2);
+    cy.get(`${board0} > .images`)
+      .children('img[src$="/sample-image.jpg"]', {timeout: 300})
+      .should("have.length", 1);
+    cy.get(rightChevron).click();
+    cy.get(board0).should('be.not.visible');
+    cy.get(board1).should('be.visible');
+    cy.get(leftChevron).click();
+    cy.get(`${board0} > .images`)
+      .children({timeout: 300})
+      .should("have.length", 2);
+    cy.get(`${board0} > .images`)
+      .children('img[src$="/sample-image.jpg"]', {timeout: 300})
+      .should("have.length", 1);
+  })
+
+  it("check ability to drag the searched sample image to a different pinboard", () => {
+    const sampleImage = ".sample-image";
+    const rightChevron = ".fa-chevron-right";
+    const board0 = ".board.board-index-0";
+    const board1 = ".board.board-index-1";
+    const sampleImagedataTransfer = new DataTransfer()
+    cy.get(board0).should('be.visible');
+    cy.get(board1).should('be.not.visible');
+    cy.get(sampleImage).trigger("dragstart", {
+      sampleImagedataTransfer
+    });
+
+    for (var i = 0; i < 10; i++) {
+      cy.get(rightChevron).trigger("dragover", {
+        sampleImagedataTransfer
+      });
+      cy.wait(100);
+    }
+    
+    cy.get(board0).should('be.not.visible');
+    cy.get(board1).should('be.visible');
+
+    cy.get(board1).trigger("drop", {
+      sampleImagedataTransfer
+    });
+
+    cy.get(sampleImage).trigger("dragend", {
+      sampleImagedataTransfer
+    });
+
+    cy.get(`${board1} > .images`)
+      .children({timeout: 300})
+      .should("have.length", 2);
+    cy.get(`${board1} > .images`)
+    .children('img[src$="/sample-image.jpg"]', {timeout: 300})
+    .should("have.length", 1);
+  })
+
+  it("check whether images can be removed from a pinboard after switching pinboards", () => {
+    const sampleImage = ".sample-image";
+    const droppedSampleImage = 'img[src$="/sample-image.jpg"][class="pinboard-image"]';
+    const leftChevron = ".fa-chevron-left";
+    const rightChevron = ".fa-chevron-right";
+    const board0 = ".board.board-index-0";
+    const board1 = ".board.board-index-1";
+    const sampleImagedataTransfer = new DataTransfer()
+
+    // Drop searched sample image into pinboard 0 
+    cy.get(board0).should('be.visible');
+    cy.get(board1).should('be.not.visible');
+    cy.dragAndDrop(sampleImage,board0);
+    cy.get(`${board0} > .images`)
+      .children({timeout: 300})
+      .should("have.length", 2);
+    cy.get(`${board0} > .images`)
+      .children('img[src$="/sample-image.jpg"]', {timeout: 300})
+      .should("have.length", 1);
+
+    // Drag searched sample image to pinboard 1 and try to remove by dropping outside of pinboard 1
+    cy.get(droppedSampleImage).trigger("dragstart", {
+      sampleImagedataTransfer
+    });
+
+    for (var i = 0; i < 10; i++) {
+      cy.get(rightChevron).trigger("dragover", {
+        sampleImagedataTransfer
+      });
+      cy.wait(100);
+    }
+    
+    cy.get(board0).should('be.not.visible');
+    cy.get(board1).should('be.visible');
+
+    cy.get(sampleImage).trigger("drop", {
+      sampleImagedataTransfer
+    });
+
+    cy.get(droppedSampleImage).trigger("dragend", {
+      sampleImagedataTransfer,
+      force: true
+    });
+
+    cy.get(`${board1} > .images`)
+      .children({timeout: 300})
+      .should("have.length", 1);
+    cy.get(`${board1} > .images`)
+    .children('img[src$="/sample-image.jpg"]', {timeout: 300})
+    .should("have.length", 0);
+
+    // Check if pinboard 0 no longer has sample image
+    cy.get(leftChevron).click();
+    cy.get(board0).should('be.visible');
+    cy.get(board1).should('be.not.visible');
+    cy.get(`${board0} > .images`)
+      .children({timeout: 300})
+      .should("have.length", 1);
+    cy.get(`${board0} > .images`)
+      .children('img[src$="/sample-image.jpg"]', {timeout: 300})
+      .should("have.length", 0);
+  })
+
+  it("check whether images can be moved from one pinboard to another", () => {
+    const sampleImage = 'img[src$="/pinboard-0-initial-image.jpg"][class="pinboard-image"]';
+    const leftChevron = ".fa-chevron-left";
+    const rightChevron = ".fa-chevron-right";
+    const board0 = ".board.board-index-0";
+    const board1 = ".board.board-index-1";
+    const sampleImagedataTransfer = new DataTransfer()
+
+    cy.get(board0).should('be.visible');
+    cy.get(board1).should('be.not.visible');
+    cy.get(`${board0} > .images`)
+    .children({timeout: 300})
+    .should("have.length", 1);
+
+    // Drag sample image from pinboard 0 and try to move it to pinboard 1
+    cy.get(sampleImage).trigger("dragstart", {
+      sampleImagedataTransfer
+    });
+
+    for (var i = 0; i < 10; i++) {
+      cy.get(rightChevron).trigger("dragover", {
+        sampleImagedataTransfer
+      });
+      cy.wait(100);
+    }
+    
+    cy.get(board0).should('be.not.visible');
+    cy.get(board1).should('be.visible');
+
+    cy.get(board1).trigger("drop", {
+      sampleImagedataTransfer
+    });
+
+    cy.get(sampleImage).trigger("dragend", {
+      sampleImagedataTransfer,
+      force: true
+    });
+
+    cy.get(`${board1} > .images`)
+      .children({timeout: 300})
+      .should("have.length", 2);
+    cy.get(`${board1} > .images`)
+      .children('img[src$="/pinboard-0-initial-image.jpg"]', {timeout: 300})
+      .should("have.length", 1);
+    cy.get(`${board1} > .images`)
+      .children('img[src$="/pinboard-1-initial-image.jpg"]', {timeout: 300})
+      .should("have.length", 1);
+
+    // Check if pinboard 0 no longer has sample image
+    cy.get(leftChevron).click();
+    cy.get(board0).should('be.visible');
+    cy.get(board1).should('be.not.visible');
+    cy.get(`${board0} > .images`)
+      .children({timeout: 300})
+      .should("have.length", 0);
+  })
+
+  it("check whether images can be transferred from one pinboard to another while moving out of the board", () => {
+    const sampleImage = ".sample-image";
+    const sampleImageBoardZero = 'img[src$="/pinboard-0-initial-image.jpg"][class="pinboard-image"]';
+    const leftChevron = ".fa-chevron-left";
+    const rightChevron = ".fa-chevron-right";
+    const board0 = ".board.board-index-0";
+    const board1 = ".board.board-index-1";
+    const sampleImagedataTransfer = new DataTransfer()
+
+    cy.get(board0).should('be.visible');
+    cy.get(board1).should('be.not.visible');
+    cy.get(`${board0} > .images`)
+    .children({timeout: 300})
+    .should("have.length", 1);
+
+    // Drag sample image from pinboard 0 and try to move it to pinboard 1, dragging it out of bounds alon gthe way
+    cy.get(sampleImageBoardZero).trigger("dragstart", {
+      sampleImagedataTransfer
+    });
+
+    for (var i = 0; i < 10; i++) {
+      cy.get(rightChevron).trigger("dragover", {
+        sampleImagedataTransfer
+      });
+      cy.wait(100);
+    }
+    
+    cy.get(board0).should('be.not.visible');
+    cy.get(board1).should('be.visible');
+
+    for (var i = 0; i < 2; i++) {
+      cy.get(sampleImage).trigger("dragover", {
+        sampleImagedataTransfer
+      });
+      cy.wait(100);
+    }
+    cy.get(board1).trigger("drop", {
+      sampleImagedataTransfer
+    });
+
+    cy.get(sampleImageBoardZero).trigger("dragend", {
+      sampleImagedataTransfer,
+      force: true
+    });
+
+    cy.get(`${board1} > .images`)
+      .children({timeout: 300})
+      .should("have.length", 2);
+    cy.get(`${board1} > .images`)
+      .children('img[src$="/pinboard-0-initial-image.jpg"]', {timeout: 300})
+      .should("have.length", 1);
+    cy.get(`${board1} > .images`)
+      .children('img[src$="/pinboard-1-initial-image.jpg"]', {timeout: 300})
+      .should("have.length", 1);
+
+    // Check if pinboard 0 no longer has sample image
+    cy.get(leftChevron).click();
+    cy.get(board0).should('be.visible');
+    cy.get(board1).should('be.not.visible');
+    cy.get(`${board0} > .images`)
+      .children({timeout: 300})
+      .should("have.length", 0);
+  })
+})
 
 
 describe ("edge cases", () => {
@@ -168,6 +465,34 @@ describe ("edge cases", () => {
       .children('img[src$="/sample-image.jpg"]', {timeout: 300})
       .should("have.length", 0);
   })
+
+  it("can store A LOT OF searched sample images with drag and drop", () => {
+    const sampleImage = ".sample-image";
+    const board = ".board.board-index-0";
+    const NUMIMAGES = 40;
+    for (var i = 0; i < NUMIMAGES; ++i) {
+      const dataTransfer = new DataTransfer();
+
+      cy.get(sampleImage).trigger("dragstart", {
+        dataTransfer
+      });
+    
+      cy.get(board).trigger("drop", {
+        dataTransfer,
+        force: true
+      });
+    
+      cy.get(sampleImage).trigger("dragend", {
+        dataTransfer
+      });
+    }
+    cy.get(`${board} > .images`)
+    .children({timeout: 300})
+    .should("have.length", NUMIMAGES+1);
+    cy.get(`${board} > .images`)
+      .children('img[src$="/sample-image.jpg"]', {timeout: 300})
+      .should("have.length", NUMIMAGES);
+  })  
 }) 
 
 
