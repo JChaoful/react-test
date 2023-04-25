@@ -25,3 +25,4 @@ yarn-error.log*
 #test outputs
 cypress/results
 cypress/videos
+cypress/screenshots
